@@ -1,9 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
-// import { useSelector } from 'react-redux';
+import storage from 'redux-persist/lib/storage';
+import { persistReducer } from 'redux-persist';
 
-// const contactsState = useSelector(state => state.contacts);
-
-export const contactsSlice = createSlice({
+const contactsSlice = createSlice({
   name: 'contacts',
   initialState: { value: [] },
   reducers: {
@@ -11,19 +10,23 @@ export const contactsSlice = createSlice({
       state.value.push(action.payload);
     },
     deleteContact: (state, action) => {
-      console.log(state);
       state.value = state.value.filter(item => item.id !== action.payload);
     },
-    // increment: state => {
-    //   state.value += 1;
-    // },
-    // decrement: state => {
-    //   state.value -=
-    // },
-    // incrementByAmount: (state, action) => {
-    //   state.value += action.payload;
-    // },
   },
 });
 
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage,
+};
+
+export const contactsReducer = persistReducer(
+  persistConfig,
+  contactsSlice.reducer
+);
+
 export const { addContact, deleteContact } = contactsSlice.actions;
+
+// Selectors
+export const getContactsValue = state => state.persons.value;

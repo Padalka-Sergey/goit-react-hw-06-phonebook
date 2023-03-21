@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { nanoid } from 'nanoid';
 // import { data } from 'data/data';
 import { Container } from 'components/Container/Container';
@@ -6,23 +5,18 @@ import { ContactForm } from 'components/ContactForm/ContactForm';
 import { ContactsListWrapper } from 'components/ContactsList/ContactsList';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { addContact, deleteContact } from '../../redux/contactsSlice';
+import {
+  addContact,
+  deleteContact,
+  getContactsValue,
+} from 'redux/contactsSlice';
+import { showContacts, getFilterContactsValue } from 'redux/filterSlice';
 
 export function App() {
-  // const contactsLocal = localStorage.getItem('contacts');
-  // const parsedContacts = JSON.parse(contactsLocal);
-  // let dataLocal = data;
-  // if (parsedContacts) {
-  //   dataLocal = parsedContacts;
-  // }
-  // const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
-
-  const contacts = useSelector(state => {
-    // console.log(state.persons.value);
-    return state.persons.value;
-  });
   const dispatch = useDispatch();
+
+  const contacts = useSelector(getContactsValue);
+  const filterContactsState = useSelector(getFilterContactsValue);
 
   const formSubmitHandler = dataHandle => {
     const { name } = dataHandle;
@@ -43,46 +37,37 @@ export function App() {
 
   const onFilterHandler = evt => {
     const { value } = evt.currentTarget;
-    setFilter(value);
+    dispatch(showContacts(value));
   };
 
   const onFilterContacts = () => {
-    const normFilter = filter.toLowerCase();
+    const normFilter = filterContactsState.toLowerCase();
     return contacts.filter(contactEl =>
       contactEl.name.toLowerCase().includes(normFilter)
     );
   };
 
   const onDataContacts = () => {
-    if (filter !== '') {
+    if (filterContactsState !== '') {
       return onFilterContacts();
     }
-    // console.log(contacts);
     return contacts;
   };
 
   const onDelete = contactId => {
-    // setContacts(contacts => contacts.filter(({ id }) => id !== contactId));
     dispatch(deleteContact(contactId));
   };
-
-  // useEffect(() => {
-  //   localStorage.setItem('contacts', JSON.stringify(contacts));
-  // }, [contacts]);
 
   return (
     <Container title="Phonebook">
       <ContactForm onSubmitProps={formSubmitHandler} />
       <ContactsListWrapper
         title="Contacts"
-        value={filter}
+        value={filterContactsState}
         onFilterHandler={onFilterHandler}
         dataContacts={onDataContacts()}
         onDelete={onDelete}
-      >
-        {/* <Filter value={filter} onFilterHandler={onFilterHandler} />
-        <ContactsItemList dataContacts={onDataContacts()} onDelete={onDelete} /> */}
-      </ContactsListWrapper>
+      ></ContactsListWrapper>
     </Container>
   );
 }

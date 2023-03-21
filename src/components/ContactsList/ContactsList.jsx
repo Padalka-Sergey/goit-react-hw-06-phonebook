@@ -16,10 +16,10 @@ export const ContactsListWrapper = ({
   onDelete,
 }) => {
   return (
-    <ContactsListBox>
-      <ContactsListTitle>{title}</ContactsListTitle>
-      <Filter value={value} onFilterHandler={onFilterHandler} />
-      {dataContacts.length !== 0 && (
+    (dataContacts.length !== 0 || value !== '') && (
+      <ContactsListBox>
+        <ContactsListTitle>{title}</ContactsListTitle>
+        <Filter value={value} onFilterHandler={onFilterHandler} />
         <ContactItems>
           {dataContacts.map(({ name, number, id }) => (
             <ContactsItem
@@ -31,8 +31,8 @@ export const ContactsListWrapper = ({
             ></ContactsItem>
           ))}
         </ContactItems>
-      )}
-    </ContactsListBox>
+      </ContactsListBox>
+    )
   );
 };
 
