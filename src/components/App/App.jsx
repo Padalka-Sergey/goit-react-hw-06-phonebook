@@ -1,19 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { nanoid } from 'nanoid';
-import { data } from 'data/data';
+// import { data } from 'data/data';
 import { Container } from 'components/Container/Container';
 import { ContactForm } from 'components/ContactForm/ContactForm';
 import { ContactsListWrapper } from 'components/ContactsList/ContactsList';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { addContact, deleteContact } from '../../redux/contactsSlice';
+
 export function App() {
-  const contactsLocal = localStorage.getItem('contacts');
-  const parsedContacts = JSON.parse(contactsLocal);
-  let dataLocal = data;
-  if (parsedContacts) {
-    dataLocal = parsedContacts;
-  }
-  const [contacts, setContacts] = useState(dataLocal);
+  // const contactsLocal = localStorage.getItem('contacts');
+  // const parsedContacts = JSON.parse(contactsLocal);
+  // let dataLocal = data;
+  // if (parsedContacts) {
+  //   dataLocal = parsedContacts;
+  // }
+  // const [contacts, setContacts] = useState([]);
   const [filter, setFilter] = useState('');
+
+  const contacts = useSelector(state => {
+    // console.log(state.persons.value);
+    return state.persons.value;
+  });
+  const dispatch = useDispatch();
 
   const formSubmitHandler = dataHandle => {
     const { name } = dataHandle;
@@ -29,7 +38,7 @@ export function App() {
       id: nanoid(),
     };
 
-    setContacts(contacts => [newContact, ...contacts]);
+    dispatch(addContact(newContact));
   };
 
   const onFilterHandler = evt => {
@@ -48,19 +57,21 @@ export function App() {
     if (filter !== '') {
       return onFilterContacts();
     }
+    // console.log(contacts);
     return contacts;
   };
 
   const onDelete = contactId => {
-    setContacts(contacts => contacts.filter(({ id }) => id !== contactId));
+    // setContacts(contacts => contacts.filter(({ id }) => id !== contactId));
+    dispatch(deleteContact(contactId));
   };
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  // useEffect(() => {
+  //   localStorage.setItem('contacts', JSON.stringify(contacts));
+  // }, [contacts]);
 
   return (
-    <Container title="Phonebook kak dela?">
+    <Container title="Phonebook">
       <ContactForm onSubmitProps={formSubmitHandler} />
       <ContactsListWrapper
         title="Contacts"
