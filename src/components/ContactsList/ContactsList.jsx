@@ -1,6 +1,10 @@
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { ContactsItem } from 'components/ContactItem/ContactItem';
 import { Filter } from 'components/Filter/Filter';
+
+import { useSelector } from 'react-redux';
+import { getFilterContactsValue } from 'redux/filterSlice';
+import { getContactsValue } from 'redux/contactsSlice';
 
 import {
   ContactsListBox,
@@ -8,26 +12,36 @@ import {
   ContactItems,
 } from './ContactsList.styled';
 
-export const ContactsListWrapper = ({
-  title,
-  value,
-  onFilterHandler,
-  dataContacts,
-  onDelete,
-}) => {
+export const ContactsListWrapper = () => {
+  const contacts = useSelector(getContactsValue);
+  const filterContactsState = useSelector(getFilterContactsValue);
+
+  const onFilterContacts = () => {
+    const normFilter = filterContactsState.toLowerCase();
+    return contacts.filter(contactEl =>
+      contactEl.name.toLowerCase().includes(normFilter)
+    );
+  };
+
+  const onDataContacts = () => {
+    if (filterContactsState !== '') {
+      return onFilterContacts();
+    }
+    return contacts;
+  };
+
   return (
-    (dataContacts.length !== 0 || value !== '') && (
+    (onDataContacts().length !== 0 || filterContactsState !== '') && (
       <ContactsListBox>
-        <ContactsListTitle>{title}</ContactsListTitle>
-        <Filter value={value} onFilterHandler={onFilterHandler} />
+        <ContactsListTitle>Contacts</ContactsListTitle>
+        <Filter />
         <ContactItems>
-          {dataContacts.map(({ name, number, id }) => (
+          {onDataContacts().map(({ name, number, id }) => (
             <ContactsItem
               key={id}
               id={id}
               name={name}
               number={number}
-              onDelete={onDelete}
             ></ContactsItem>
           ))}
         </ContactItems>
@@ -36,15 +50,12 @@ export const ContactsListWrapper = ({
   );
 };
 
-ContactsListWrapper.propTypes = {
-  title: PropTypes.string.isRequired,
-  onFilterHandler: PropTypes.func.isRequired,
-  dataContacts: PropTypes.arrayOf(
-    PropTypes.exact({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-      value: PropTypes.string,
-    })
-  ),
-};
+// ContactsListWrapper.propTypes = {
+//   dataContacts: PropTypes.arrayOf(
+//     PropTypes.exact({
+//       id: PropTypes.string.isRequired,
+//       name: PropTypes.string.isRequired,
+//       number: PropTypes.string.isRequired,
+//     })
+//   ),
+// };
